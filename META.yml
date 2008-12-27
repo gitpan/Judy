@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Judy
+version:            0.09
+abstract:           Library for creating and accessing dynamic arrays 
+author:
+    - Joshua ben Jore <jjore@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Alien::Judy:         0.05
+    ExtUtils::CBuilder:  0
+    Sub::Exporter:       0
+    Test::More:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

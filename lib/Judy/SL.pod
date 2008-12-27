@@ -1,0 +1,176 @@
+=head1 NAME
+
+Judy::SL - Library for creating and accessing a dynamic array (hash), using a null-terminated string as a key
+
+
+
+=head1 SYNOPSIS
+
+Shows a string sort routine
+
+  my $judy = 0;
+  while (<>) {
+      Insert($judy,$_,0);
+  }
+
+  my(undef,undef,$key) = First($judy,'');
+  if ( defined $key ) {
+      print $key;
+      print $key while (undef,undef,$key) = Next($judy,$key);
+  }
+
+=head1 DESCRIPTION
+
+A JudySL array is the equivalent of a sorted set of strings, each
+associated with a Value (word). A Value is addressed by a Key, which
+is a null-terminated character string of any length. Memory to support
+the array is allocated as key/value pairs are inserted, and released
+as key/value pairs are deleted. This is a form of "hash", where array
+elements are also sorted lexicographically (case-sensitive) by
+keys. This could be thought of as
+
+    @JudySLArray = ("Toto, I don't think we're in Kansas any more");
+
+A Judy::SL array is allocated with a NULL pointer
+
+    my $judy = 0;
+
+There are no duplicate keys in a Judy::SL array.
+
+The default error handling sends a message to the standard error and
+terminates the program with exit(1).
+
+
+
+=head1 EXPORT
+
+All functions are exportable by L<Sub::Exporter>.
+
+
+
+=head1 DATA TYPES
+
+=over
+
+=item *
+
+C<$Judy> - Judy::SL array
+
+=item *
+
+C<$Key> - bytes
+
+=item *
+
+C<$Value> - Stored integer
+
+=item *
+
+C<$PValue> - JudySL array element. A pointer cast to integer.
+
+=item *
+
+$Rc - Return flag
+
+=back
+
+
+
+=head1 BASIC FUNCTIONS
+
+=head2 $PValue = Set( $Judy, $Key, $Value )
+
+Insert a C<$Key> string and C<$Value> in the JudySL array. The stored C<$Value>
+is updated to the passed-in C<$Value>.
+
+Return C<$PValue> pointing to the stored C<$Value>. Your program can use
+this pointer to modify the stored C<$Value>, for example:
+
+    use Judy::Mem 'Poke';
+    my $Judy = 0;
+    my $PValue = Set( $Judy, 'Aloha', 0 );
+
+    Poke( $PValue, 1234 );
+
+Note: Set() and Delete() reorganize the JudySL array. Therefore,
+pointers returned from previous JudySL calls become invalid and must
+be reacquired.
+
+=head2 $Rc = Delete( $Judy, $Key )
+
+Delete the specified C<$Key>/C<$Value> pair (array element) from the JudySL
+array.
+
+Returns true if the element was removed, false otherwise.
+
+=head2 ( $PValue, $Value ) = Get( $Judy, $Key )
+
+Get C<$Key>'s C<$Value>. If C<$Key> exists in C<$Judy>, return C<$PValue> pointing to
+C<$Key>'s C<$Value> and C<$Value> in a list. Return an empty list if C<$Key> is
+not present.
+
+=head2 $Rc = Free( $Judy )
+
+Given a pointer to a JudySL array (C<$Judy>), free the entire array
+(much faster than using a C<First()>, C<Delete()> loop.)
+
+Return $Rc set to the number of bytes freed and C<$Judy> set to 0.
+
+=head1 BASIC SEARCH FUNCTIONS
+
+The JudySL search functions allow you to search for keyss in the
+array. You may search inclusively or exclusively, in either forward or
+reverse directions.
+
+If successful, C<$PValue> is returned set to a pointer to C<$Value>, C<$Value>
+is returned, and C<$Key> is returned set to the found index. If
+unsuccessful, nothing is returned.
+
+=over
+
+=item ( $PValue, $Value, $FoundKey ) = First( $Judy, $Key )
+
+Search (inclusive) for the first C<$Key> present that is equal to or
+greater than the passed C<$Key> string. (Start with an empty string to
+find the first key in the array.) First() is typically used to
+I<begin> a sorted-order scan of the valid C<$Key>s in a JudySL array.
+
+    my ( undef, $Value, $Key ) = First( $Judy, '' );
+    while ( $Key ) {
+        print "$Key=$Value\n";
+        ( undef, $Value, $Key ) = Next( $Judy, $Key );
+    }
+
+    Search (exclusive) for the previous index present that is less than the passed Index string. JSLP() is typically used to continue a reverse-sorted-order scan of the valid indexes in a JudySL array, or to locate a "neighbor" of a given index. 
+
+
+JSLF() is typically u
+
+=item ( $PValue, $Value, $FoundKey ) = Next( $Judy, $Key )
+
+Search (inclusive) for the first C<$Key> present that is greater than the
+passed C<$Key> string. (Start with an empty string to find the first key
+in the array.) C<Next()> is typically used to I<continue> a
+sorted-order scan of the valid C<$Key>s in a JudySL array.
+
+=item ( $PValue, $Value, $FoundKey ) = Last( $Judy, $Key )
+
+Search (inclusive) for the first C<$Key> present that is less than or
+equal to the passed C<$Key> string. (Start with a maximum-valued string
+to look up the last C<$Key> in the array, such as a max-length string of
+C<0xff> bytes.)  C<Last()> is typically used to C<begin> a
+reverse-sorted-order scan of the valid keys in a JudySL array.
+
+    my ( undef, $Value, $Key ) = Last( $Judy, '' );
+    while ( $Key ) {
+        print "$Key=$Value\n";
+        ( undef, $Value, $Key ) = Prev( $Judy, $Key );
+    }
+
+=item ( $PValue, $Value, $FoundKey ) = Prev( $Judy, $Key )
+
+Search (inclusive) for the first C<$Key> present that is less than the
+passed C<$Key> string. C<Prev()> is typically used to C<continue> a
+reverse-sorted-order scan of the valid keys in a JudySL array.
+
+=back

@@ -1,0 +1,74 @@
+Revision history for Judy
+
+0.09 - Sat Dec 26 12:59:00 2008
+        API changes:
+            Moved PJERR and JLAP_INVALID from Judy::Mem to Judy
+            Removed PeekI, PokeI, PeekU, PokeU using IV and UV
+            Added Peek and Poke using Word_t
+        
+        Moved XS from Judy::HS to Judy.
+        Added Judy.pm, Judy.pod
+        Release script checks a -Duse64bitint perl.
+        Added notes to XS
+        DEADBEEF is sized to UVSIZE
+        Switched from PPCODE-style XS to CODE/OUTPUT-style XS to use implicit TARG.
+        Added typedefs for Pvoid_t, Word_t*, Word_t
+        Throw warning when UV/IV integers discard data when being truncated
+        for storage into native sized Word_t.
+        Require at least Alien-Judy 0.05
+        Removed const-c.inc, const-xs.inc from the dist since they're generated
+        Stop assigning 0 to $judy objects in example code - undef suffices
+        Moved PJERR and JLAP_INVALID to Judy from Judy::Mem
+        Judy::1, Judy::L, Judy::SL, Judy::HS all load Judy
+        Judy loads all of Judy::1, Judy::L, Judy::S, Judy::HS
+        Added test t/40l.t which checks for data loss on machines with
+            -Duse64bitint that don't have 64-bit words.
+
+0.08 - Tue Dec 22 00:07:00 2008
+        Add -L and -I build parameters to find Alien::Judy
+        Adding docs
+
+0.07 - Sun Dec 21 09:46:00 2008
+        Added Judy::1 and Judy::L
+        Changed API. Renamed search functions to be in line with the C library
+            SearchForward -> First
+            ContinueForward -> Next
+            SearchBackward -> Last
+            ContinueBackward -> Prev
+        Removed vestigial PeekPoke from tests
+        Added constants PJERR, PJLAP_INVALID
+
+0.06 - Sat Dec 20 01:20:00 2008
+        Depends on Alien::Judy to auto-install Judy
+
+0.05 - Fri Dec 19 00:35:34 2008
+	Added Judy::Mem
+        Added t/20sl.t
+        Renamed t/10basic.t to t/10hs.t
+
+        Removed PeekPoke dependency. Re-implemented in Judy::Mem.
+        Stop using sv_2pvbyte, use SvPVbyte instead.
+        Using ppport.h at its own recommendation. Possibly incompatible with 5.6.1. See comment in HS.xs
+
+        Changed C comment syntax from // to /**/
+        Fixed README, now it autogenerates from README.pod
+        Git ignores Judy-*
+        Cleaned MANIFEST
+
+0.04 - Fri Dec 20 12:02:00 2008
+        Added Judy::SL
+        Fixed documentation in Judy::HS
+
+0.03 - Thu Dec 19 02:00:00 2008
+        Rewrote API
+
+0.02 - Thu Dec 18 00:05:27 2008
+        Rewrote API
+        Moving pod to a separate file, minimally rewriting docs for new API
+        Rendered pod to README
+        Removed boilerplate from Changes
+        Author tests skipped unless AUTHOR_TEST
+
+0.01 - Wed Dec 17 13:31:03 2008
+	Initial upload.
+	Provided "raw" HS macros, some tests failing
