@@ -1,5 +1,16 @@
 Revision history for Judy
 
+0.11 - Sat Jan  3 19:22:00 209
+        Allow utf8 perl strings
+        Typemap handles SET magic for Word_t, Word_t*, Pvoid_t types
+        Introduce typedef Str for uniform SV*->((char*),STRLEN) capture
+        Silence warning, casting from (char*) to (uint8_t*) and (const uint8_t*)'
+        Ptr2String2 now triggers set magic
+        Now ignoring _Inline
+        Dropping const-{c,xs}.inc - it was throwing annoying warnings
+        Adding inc/My/Paths.pm to put -I, -l, -L cc handling in a single place
+        Currently using Inline::C for some magic tests. Plan is to remove Inline.
+
 0.10 - Sat Dec 26 15:06:00 2008
         Require Alien::Judy 0.06+
 

@@ -19,7 +19,10 @@
  */
 #include "Judy.h"
 
-#include "const-c.inc"
+/*
+ * pjudy.h includes whatever I need to share between Judy.xs and the test suite.
+ */
+#include "pjudy.h"
 
 #if PTRSIZE == 4
 #	define PDEADBEEF (void*)0xDEADBEEF
@@ -33,11 +36,25 @@
 #	define DEADBEEF 0xDEADBEEFDEADBEEF
 #endif
 
-MODULE = Judy PACKAGE = Judy
+MODULE = Judy PACKAGE = Judy PREFIX = lj_
 
 PROTOTYPES: ENABLE
 
-INCLUDE: const-xs.inc
+Pvoid_t
+lj_PJERR()
+    PROTOTYPE:
+    CODE:
+        RETVAL = PJERR;
+    OUTPUT:
+        RETVAL
+
+Word_t
+lj_JLAP_INVALID()
+    PROTOTYPE:
+    CODE:
+        RETVAL = JLAP_INVALID;
+    OUTPUT:
+        RETVAL
 
 MODULE = Judy PACKAGE = Judy::Mem PREFIX = ljme_
 
@@ -45,33 +62,34 @@ PROTOTYPES: DISABLE
 
 void*
 ljme_String2Ptr(in)
-        SV *in
+        Str in
     INIT:
         size_t length = DEADBEEF;
         void *out = PDEADBEEF;
     CODE:
-        out = SvPVbyte( in, length );
-        Newx(out,length,char);
-        Copy(in,out,length,char);
+        Newx(out,in.length,char);
+        Copy(in.ptr,out,in.length,char);
         RETVAL = out;
     OUTPUT:
         RETVAL
 
-char*
+Str
 ljme_Ptr2String(in)
         void *in
     CODE:
         /* Guess about the length of the string. Use Ptr2String2 if there are nulls. */
-        RETVAL = in;
+        RETVAL.ptr = in;
+        RETVAL.length = 0;
     OUTPUT:
         RETVAL
 
-SV*
+Str
 ljme_Ptr2String2(in,length)
         void *in
         STRLEN length
     CODE:
-        RETVAL = newSVpv((char*)in,length);
+        RETVAL.ptr = in;
+        RETVAL.length = length;
     OUTPUT:
         RETVAL
 
@@ -546,16 +564,15 @@ ljl_PrevEmpty( PJLArray, Key )
 MODULE = Judy PACKAGE = Judy::SL PREFIX = ljsl_
 
 Word_t*
-ljsl_Set( PJSLArray, Key_sv, Value )
+ljsl_Set( PJSLArray, Key, Value )
         Pvoid_t PJSLArray
-        SV *Key_sv
+        Str Key
         Word_t Value
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t *PValue = PDEADBEEF;
     CODE:
-        JSLI(PValue,PJSLArray,Key);
+        /* Cast from (char*) to (const uint8_t*) to silence a warning. */
+        JSLI(PValue,PJSLArray,(const uint8_t*)Key.ptr);
         *PValue = Value;
         RETVAL = PValue;
     OUTPUT:
@@ -563,30 +580,28 @@ ljsl_Set( PJSLArray, Key_sv, Value )
         RETVAL
 
 int
-ljsl_Delete( PJSLArray, Key_sv )
+ljsl_Delete( PJSLArray, Key )
         Pvoid_t PJSLArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         int Rc_int = DEADBEEF;
     CODE:
-        JSLD(Rc_int,PJSLArray,Key);
+        /* Cast from (char*) to (const uint8_t*) to silence a warning. */
+        JSLD(Rc_int,PJSLArray,(const uint8_t*)Key.ptr);
         RETVAL = Rc_int;
     OUTPUT:
         PJSLArray
         RETVAL
 
 void
-ljsl_Get( PJSLArray, Key_sv )
+ljsl_Get( PJSLArray, Key )
         Pvoid_t PJSLArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t *PValue = PDEADBEEF;
     PPCODE:
-        JSLG(PValue,PJSLArray,Key);
+        /* Cast from (char*) to (const uint8_t*) to silence a warning. */
+        JSLG(PValue,PJSLArray,(const uint8_t*)Key.ptr);
 
         if ( PValue ) {
             EXTEND(SP,2);
@@ -607,89 +622,83 @@ ljsl_Free( PJSLArray )
         RETVAL
 
 void
-ljsl_First( PJSLArray, Key_sv )
+ljsl_First( PJSLArray, Key )
         Pvoid_t PJSLArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t *PValue = PDEADBEEF;
     PPCODE:
-        JSLF(PValue,PJSLArray,Key);
+        /* Cast from (char*) to (uint8_t*) to silence a warning. */
+        JSLF(PValue,PJSLArray,(uint8_t*)Key.ptr);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key,0)));
+	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
         }
 
 void
-ljsl_Next( PJSLArray, Key_sv )
+ljsl_Next( PJSLArray, Key )
         Pvoid_t PJSLArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t *PValue = PDEADBEEF;
     PPCODE:
-        JSLN(PValue,PJSLArray,Key);
+        /* Cast from (char*) to (uint8_t*) to silence a warning. */
+        JSLN(PValue,PJSLArray,(uint8_t*)Key.ptr);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key,0)));
+	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
         }
 
 void
-ljsl_Last( PJSLArray, Key_sv )
+ljsl_Last( PJSLArray, Key )
         Pvoid_t PJSLArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte( Key_sv, Length );
         Word_t *PValue = PDEADBEEF;
     PPCODE:
-        JSLL(PValue,PJSLArray,Key);
+        /* Cast from (char*) to (uint8_t*) to silence a warning. */
+        JSLL(PValue,PJSLArray,(uint8_t*)Key.ptr);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key,0)));
+	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
         }
 
 void
-ljsl_Prev( PJSLArray, Key_sv )
+ljsl_Prev( PJSLArray, Key )
         Pvoid_t PJSLArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t *PValue = PDEADBEEF;
     PPCODE:
-        JSLP(PValue,PJSLArray,Key);
+        /* Cast from (char*) to (uint8_t*) to silence a warning. */
+        JSLP(PValue,PJSLArray,(uint8_t*)Key.ptr);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key,0)));
+	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
         }
 
 MODULE = Judy PACKAGE = Judy::HS PREFIX = ljhs_
 
 Word_t
-ljhs_Duplicates( PJHSArray, Key_sv )
+ljhs_Duplicates( PJHSArray, Key )
         Pvoid_t PJHSArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN  Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t *PValue = PDEADBEEF;
     CODE:
-        JHSI(PValue,PJHSArray,Key,(Word_t)Length);
+        JHSI(PValue,PJHSArray,Key.ptr,Key.length);
         RETVAL = *PValue;
         ++*PValue;
     OUTPUT:
@@ -699,16 +708,14 @@ ljhs_Duplicates( PJHSArray, Key_sv )
 
 
 Word_t*
-ljhs_Set( PJHSArray, Key_sv, Value )
+ljhs_Set( PJHSArray, Key, Value )
         Pvoid_t PJHSArray
-        SV *Key_sv
+        Str Key
         Word_t Value
     INIT:
-        STRLEN  Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t  *PValue = PDEADBEEF;
     CODE:
-        JHSI(PValue,PJHSArray,Key,(Word_t)Length);
+        JHSI(PValue,PJHSArray,Key.ptr,Key.length);
         *PValue = Value;
         RETVAL = PValue;
     OUTPUT:
@@ -716,30 +723,26 @@ ljhs_Set( PJHSArray, Key_sv, Value )
         RETVAL
 
 int
-ljhs_Delete( PJHSArray, Key_sv )
+ljhs_Delete( PJHSArray, Key )
         Pvoid_t PJHSArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         int Rc_int = DEADBEEF;
     CODE:
-        JHSD(Rc_int,PJHSArray,Key,(Word_t)Length);
+        JHSD(Rc_int,PJHSArray,Key.ptr,Key.length);
         RETVAL = Rc_int;
     OUTPUT:
         PJHSArray
         RETVAL
 
 void
-ljhs_Get( PJHSArray, Key_sv )
+ljhs_Get( PJHSArray, Key )
         Pvoid_t PJHSArray
-        SV *Key_sv
+        Str Key
     INIT:
-        STRLEN Length = DEADBEEF;
-        char *Key = SvPVbyte(Key_sv,Length);
         Word_t *PValue = PDEADBEEF;
     PPCODE:
-        JHSG(PValue,PJHSArray,Key,(Word_t)Length);
+        JHSG(PValue,PJHSArray,Key.ptr,Key.length);
 
         /* OUTPUT */
         if ( PValue ) {
