@@ -2,6 +2,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/* FIXME: omg, this is a buffer overflow. Store nothing in Judy::SL
+   that is larger than this. */
+#define MAXLINELEN 1000000
+
 /* --- hint for SvPVbyte ---
    Does not work in perl-5.6.1, ppport.h implements a version
    borrowed from perl-5.7.3. */
@@ -41,6 +45,11 @@
 #	define DEADBEEF 0xDEADBEEFDEADBEEF
 #endif
 
+
+
+
+
+
 MODULE = Judy PACKAGE = Judy PREFIX = lj_
 
 PROTOTYPES: ENABLE
@@ -65,6 +74,11 @@ lj_JLAP_INVALID()
         RETVAL = JLAP_INVALID;
     OUTPUT:
         RETVAL
+
+
+
+
+
 
 MODULE = Judy PACKAGE = Judy::Mem PREFIX = ljme_
 
@@ -111,7 +125,7 @@ ljme_Free(ptr)
 
 IV
 Peek(ptr)
-        Word_t *ptr
+        PWord_t ptr
     CODE:
         RETVAL = (Word_t)*ptr;
     OUTPUT:
@@ -123,6 +137,11 @@ Poke(ptr,v)
         Word_t v
     CODE:
         *ptr = v;
+
+
+
+
+
 
 MODULE = Judy PACKAGE = Judy::1 PREFIX = lj1_
 
@@ -348,6 +367,11 @@ lj1_PrevEmpty( PJ1Array, Key )
             XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
+
+
+
+
+
 MODULE = Judy PACKAGE = Judy::L PREFIX = ljl_
 
 Word_t*
@@ -569,6 +593,11 @@ ljl_PrevEmpty( PJLArray, Key )
             XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
+
+
+
+
+
 MODULE = Judy PACKAGE = Judy::SL PREFIX = ljsl_
 
 Word_t*
@@ -577,8 +606,12 @@ ljsl_Set( PJSLArray, Key, Value )
         Str Key
         Word_t Value
     INIT:
-        Word_t *PValue = PDEADBEEF;
+        PWord_t PValue = PDEADBEEF;
     CODE:
+        if ( Key.length > MAXLINELEN ) {
+           croak("Sorry, can't store keys longer than MAXLINELEN for now. This is a bug.");
+        }
+
         /* Cast from (char*) to (const uint8_t*) to silence a warning. */
         JSLI(PValue,PJSLArray,(const uint8_t*)Key.ptr);
         *PValue = Value;
@@ -606,7 +639,7 @@ ljsl_Get( PJSLArray, Key )
         Pvoid_t PJSLArray
         Str Key
     INIT:
-        Word_t *PValue = PDEADBEEF;
+        PWord_t PValue = PDEADBEEF;
     PPCODE:
         /* Cast from (char*) to (const uint8_t*) to silence a warning. */
         JSLG(PValue,PJSLArray,(const uint8_t*)Key.ptr);
@@ -634,16 +667,21 @@ ljsl_First( PJSLArray, Key )
         Pvoid_t PJSLArray
         Str Key
     INIT:
-        Word_t *PValue = PDEADBEEF;
+        PWord_t PValue  = PDEADBEEF;
+        uint8_t Index[MAXLINELEN];
     PPCODE:
-        /* Cast from (char*) to (uint8_t*) to silence a warning. */
-        JSLF(PValue,PJSLArray,(uint8_t*)Key.ptr);
+        /* Copy Index because it is both input and output. */
+        Copy(Key.ptr,Index,Key.length,uint8_t);
+        Index[Key.length] = 0;
+
+        /* Cast from (char*) to (uint8_t*) to silence a warning. */ 
+        JSLF(PValue,PJSLArray,Index);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
+            PUSHs(sv_2mortal(newSVpv(Index,0)));
         }
 
 void
@@ -651,16 +689,21 @@ ljsl_Next( PJSLArray, Key )
         Pvoid_t PJSLArray
         Str Key
     INIT:
-        Word_t *PValue = PDEADBEEF;
+        PWord_t PValue = PDEADBEEF;
+        uint8_t Index[MAXLINELEN];
     PPCODE:
+        /* Copy Index because it is both input and output. */
+        Copy(Key.ptr,Index,Key.length,uint8_t);
+        Index[Key.length] = 0;
+
         /* Cast from (char*) to (uint8_t*) to silence a warning. */
-        JSLN(PValue,PJSLArray,(uint8_t*)Key.ptr);
+        JSLN(PValue,PJSLArray,Index);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
+	    PUSHs(sv_2mortal(newSVpv(Index,0)));
         }
 
 void
@@ -669,15 +712,20 @@ ljsl_Last( PJSLArray, Key )
         Str Key
     INIT:
         Word_t *PValue = PDEADBEEF;
+        uint8_t Index[MAXLINELEN];
     PPCODE:
+        /* Copy Index because it is both input and output. */
+        Copy(Key.ptr,Index,Key.length,uint8_t);
+        Index[Key.length] = 0;
+
         /* Cast from (char*) to (uint8_t*) to silence a warning. */
-        JSLL(PValue,PJSLArray,(uint8_t*)Key.ptr);
+        JSLL(PValue,PJSLArray,Index);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
+            PUSHs(sv_2mortal(newSVpv(Index,0)));
         }
 
 void
@@ -685,17 +733,27 @@ ljsl_Prev( PJSLArray, Key )
         Pvoid_t PJSLArray
         Str Key
     INIT:
-        Word_t *PValue = PDEADBEEF;
+        PWord_t PValue = PDEADBEEF;
+        uint8_t Index[MAXLINELEN];
     PPCODE:
+        /* Copy Index because it is both input and output. */
+        Copy(Key.ptr,Index,Key.length,uint8_t);
+        Index[Key.length] = 0;
+
         /* Cast from (char*) to (uint8_t*) to silence a warning. */
-        JSLP(PValue,PJSLArray,(uint8_t*)Key.ptr);
+        JSLP(PValue,PJSLArray,Index);
 
         if ( PValue ) {
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
             PUSHs(sv_2mortal(newSVuv(*PValue)));
-	    PUSHs(sv_2mortal(newSVpv(Key.ptr,0)));
+            PUSHs(sv_2mortal(newSVpv(Index,0)));
         }
+
+
+
+
+
 
 MODULE = Judy PACKAGE = Judy::HS PREFIX = ljhs_
 
@@ -770,6 +828,11 @@ ljhs_Free( PJHSArray )
     OUTPUT:
         PJHSArray
         RETVAL
+
+
+
+
+
 
 MODULE = Judy PACKAGE = Judy PREFIX = lj_
 
