@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Judy
-version:            0.20
+version:            0.21
 abstract:           Library for creating and accessing dynamic arrays 
 author:
     - Joshua ben Jore <jjore@cpan.org>
@@ -11,7 +11,7 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    Alien::Judy:         0.06
+    Alien::Judy:         0.09
     ExtUtils::CBuilder:  0
     Inline::C:           0
     Sub::Exporter:       0
