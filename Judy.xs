@@ -89,7 +89,7 @@ pvtJudyHSMemUsedV(Pvoid_t PJLArray, UWord_t remainingLength, UWord_t keyLength )
 	}
 
 	JLN( innerL, PJLArray, Index );
-	OOGA("innerL=%lx\n",innerL);
+	OOGA("innerL=%lx\n",(UWord_t)innerL);
       }
     }
   }
@@ -103,14 +103,14 @@ pvtJudyHSMemUsedV(Pvoid_t PJLArray, UWord_t remainingLength, UWord_t keyLength )
 UWord_t
 pvtJudyHSMemUsed( Pvoid_t PJHSArray )
 {
-  UWord_t sum = 0;
+  UWord_t sum;
   UWord_t keyLength = 0;
   Pvoid_t *hashL;
 
   /* Count the size of the base JudyL array that maps from key length
    * to hashes containing values with keys only that length.
    */
-  sum += JudyLMemUsed( PJHSArray );
+  sum = JudyLMemUsed( PJHSArray );
 
   /* Iterate over all key lengths and the hashes */
   JLF( hashL, PJHSArray, keyLength );
@@ -279,7 +279,7 @@ lj1_Test( PJ1Array, Key )
         PJ1Array
         RETVAL
 
-IV
+UV
 lj1_Count( PJ1Array, Key1, Key2 )
         Pvoid_t PJ1Array
         UWord_t Key1
@@ -331,10 +331,10 @@ lj1_Nth( PJ1Array, Nth )
         OOGA("%s:%d .J1BC(%#x,%#lx,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Nth,Index);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(newSViv(Index)));
+            XPUSHs(sv_2mortal(newSVuv(Index)));
         }
 
-IV
+UV
 lj1_Free( PJ1Array )
         Pvoid_t PJ1Array
     INIT:
@@ -348,7 +348,7 @@ lj1_Free( PJ1Array )
         PJ1Array
         RETVAL
 
-IV
+UV
 lj1_MemUsed( PJ1Array )
         Pvoid_t PJ1Array
     INIT:
@@ -374,11 +374,7 @@ lj1_First( PJ1Array, Key )
         OOGA("%s:%d .J1F(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 
@@ -394,11 +390,7 @@ lj1_Next( PJ1Array, Key )
         OOGA("%s:%d .J1N(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 
@@ -415,11 +407,7 @@ lj1_Last( PJ1Array, Key )
         OOGA("%s:%d .J1L(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 
@@ -435,11 +423,7 @@ lj1_Prev( PJ1Array, Key )
         OOGA("%s:%d .J1P(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 void
@@ -454,11 +438,7 @@ lj1_FirstEmpty( PJ1Array, Key )
         OOGA("%s:%d .J1FE(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 
@@ -474,11 +454,7 @@ lj1_NextEmpty( PJ1Array, Key )
         OOGA("%s:%d .J1NE(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 void
@@ -493,11 +469,7 @@ lj1_LastEmpty( PJ1Array, Key )
         OOGA("%s:%d .J1LE(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 void
@@ -512,11 +484,7 @@ lj1_PrevEmpty( PJ1Array, Key )
         OOGA("%s:%d .J1PE(%#x,%#lx,%#lx)\n",__FILE__,__LINE__,Rc_int,(long)PJ1Array,Key);
 
         if ( Rc_int ) {
-            XPUSHs(sv_2mortal(
-                (IV)Key >= 0
-                ? newSViv(Key)
-                : newSVuv(Key)
-            ));
+            XPUSHs(sv_2mortal(newSVuv(Key)));
         }
 
 
@@ -575,7 +543,7 @@ ljl_Get( PJLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,2);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
         }
 
 UWord_t
@@ -612,7 +580,7 @@ ljl_Nth( PJLArray, Nth )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVuv(Index)));
         }
 
@@ -661,7 +629,7 @@ ljl_First( PJLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVuv(Key)));
         }
 
@@ -682,7 +650,7 @@ ljl_Next( PJLArray, Key )
             OOGA("%#lx\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVuv(Key)));
         }
 
@@ -704,7 +672,7 @@ ljl_Last( PJLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVuv(Key)));
         }
 
@@ -725,7 +693,7 @@ ljl_Prev( PJLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVuv(Key)));
         }
 
@@ -870,7 +838,7 @@ ljsl_Get( PJSLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,2);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
         }
 
 UWord_t
@@ -913,7 +881,7 @@ ljsl_First( PJSLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVpv((char*)Index,0)));
         }
 
@@ -942,7 +910,7 @@ ljsl_Next( PJSLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVpv((char*)Index,0)));
         }
 
@@ -971,7 +939,7 @@ ljsl_Last( PJSLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVpv((char*)Index,0)));
         }
 
@@ -1000,7 +968,7 @@ ljsl_Prev( PJSLArray, Key )
             OOGA("%#lx)\n",*PValue);
             EXTEND(SP,3);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
             PUSHs(sv_2mortal(newSVpv((char*)Index,0)));
         }
 
@@ -1019,7 +987,7 @@ ljhs_MemUsed( PJHSArray )
     OUTPUT:
         RETVAL
 
-IWord_t
+UWord_t
 ljhs_Duplicates( PJHSArray, Key )
         Pvoid_t PJHSArray
         Str Key
@@ -1076,7 +1044,7 @@ ljhs_Get( PJHSArray, Key )
         if ( PValue ) {
             EXTEND(SP,2);
             PUSHs(sv_2mortal(newSVuv(INT2PTR(UV,PValue))));
-            PUSHs(sv_2mortal(newSViv(*PValue)));
+            PUSHs(sv_2mortal(newSViv((signed long int)*PValue)));
         }
 
 UWord_t
