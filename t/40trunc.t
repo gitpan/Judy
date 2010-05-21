@@ -12,7 +12,7 @@ if ( ( $Config{ivsize} == $Config{longsize} )
    plan( skip_all => 'sizeof(IV) == sizeof(long), hurrah' );
 }
 else {
-     plan( tests => 1 );
+     plan( tests => 2 );
 }
 
 my $judy;
@@ -20,4 +20,9 @@ my $judy;
 my $warned = '';
 $SIG{__WARN__} = sub { $warned = shift @_ };
 Set($judy,0, 4294967360 );
-like( $warned, qr/\(UV\)4294967360 truncated to \(Word_t\)64/ )
+like( $warned, qr/Truncating 4294967360 to 2147483647/, 'Truncating 4294967360 to 2147483647' );
+$warned = '';
+
+Set($ judy, -1, 0 );
+like( $warned, qr/Coercing -1 to 0/, 'Coercing -1 to 0' );
+$warned = '';
