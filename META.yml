@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Judy
-version:            0.27
+version:            0.28
 abstract:           Library for creating and accessing dynamic arrays 
 author:
     - Joshua ben Jore <jjore@cpan.org>
