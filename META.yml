@@ -1,27 +1,50 @@
---- #YAML:1.0
-name:               Judy
-version:            0.31
-abstract:           Library for creating and accessing dynamic arrays 
-author:
-    - Joshua ben Jore <jjore@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: 'Library for creating and accessing dynamic arrays'
+author: []
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Alien::Judy:         0.09
-    ExtUtils::CBuilder:  0
-    Inline::C:           0
-    Sub::Exporter:       0
-    Test::Deep:          0
-    Test::More:          0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  Config: 0
+  DynaLoader: 0
+  ExtUtils::CBuilder: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Spec: 0
+  Test::Deep: 0
+  Test::More: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3603'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Judy
+provides:
+  Judy:
+    file: lib/Judy.pm
+    version: 0.32
+  Judy::1:
+    file: lib/Judy/1.pm
+  Judy::HS:
+    file: lib/Judy/HS.pm
+  Judy::L:
+    file: lib/Judy/L.pm
+  Judy::Mem:
+    file: lib/Judy/Mem.pm
+  Judy::SL:
+    file: lib/Judy/SL.pm
+requires:
+  Alien::Judy: 0.13
+  Config: 0
+  DynaLoader: 0
+  Sub::Exporter: 0
+  constant: 0
+  perl: v5.6.0
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.32
