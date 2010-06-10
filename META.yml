@@ -25,7 +25,7 @@ name: Judy
 provides:
   Judy:
     file: lib/Judy.pm
-    version: 0.32
+    version: 0.33
   Judy::1:
     file: lib/Judy/1.pm
   Judy::HS:
@@ -37,7 +37,7 @@ provides:
   Judy::SL:
     file: lib/Judy/SL.pm
 requires:
-  Alien::Judy: 0.13
+  Alien::Judy: 0.15
   Config: 0
   DynaLoader: 0
   Sub::Exporter: 0
@@ -47,4 +47,4 @@ requires:
   warnings: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.32
+version: 0.33
