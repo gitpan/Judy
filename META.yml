@@ -14,7 +14,11 @@ build_requires:
   vars: 0
   warnings: 0
 configure_requires:
+  File::Spec: 0
   Module::Build: 0
+  strict: 0
+  vars: 0
+  warnings: 0
 dynamic_config: 1
 generated_by: 'Module::Build version 0.3603'
 license: perl
@@ -25,7 +29,7 @@ name: Judy
 provides:
   Judy:
     file: lib/Judy.pm
-    version: 0.34
+    version: 0.35
   Judy::1:
     file: lib/Judy/1.pm
   Judy::HS:
@@ -47,4 +51,4 @@ requires:
   warnings: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.34
+version: 0.35
