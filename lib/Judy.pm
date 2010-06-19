@@ -2,36 +2,27 @@ package Judy;
 
 use strict;
 use warnings;
+use vars qw( $VERSION @ISA );
 
-BEGIN {
-    our $VERSION = '0.35';
+$VERSION = '0.36';
 
-    require Alien::Judy;
-    require DynaLoader;
-
-    # Ensure that libJudy is loadable
-    if ( ! DynaLoader::dl_findfile('-lJudy') ) {
-
-        # Alien::Judy will have installed it to
-        # $Config{sitearch}/Alien/Judy however during CPAN testing it
-        # may be in any(@INC)/blib/arch/Alien/Judy.
-        local @DynaLoader::dl_library_path = (
-            @DynaLoader::dl_library_path,
-            Alien::Judy::lib_dirs(),
-        );
-        my $libJudy_file = DynaLoader::dl_findfile('-lJudy');
-        DynaLoader::dl_load_file( $libJudy_file, 0x01 );
-    }
-
-    # Now load the Perl wrapper over libJudy
-    our @ISA;
-    local @ISA = 'DynaLoader';
-    Judy->bootstrap;
+require Alien::Judy;
+my $av_version = Alien::Judy->VERSION;
+if ( $av_version < 0.18 ) {
+    die "Alien::Judy version 0.18 required--this is only version $av_version";
 }
+Alien::Judy::dl_load_libjudy();
 
-use Sub::Exporter -setup => {
-    exports => [qw[ PJERR JLAP_INVALID ]]
-};
+# Now load the Perl wrapper over libJudy
+local @ISA = 'DynaLoader';
+__PACKAGE__->bootstrap;
+
+require Sub::Exporter;
+Sub::Exporter->import(
+    -setup => {
+        exports => [qw[ PJERR JLAP_INVALID ]]
+    }
+);
 
 # Beware, each implementation also uses Judy.pm. Both Judy.pm and 1.pm
 # (for example) require() each other. In execution order:
@@ -48,10 +39,7 @@ use Sub::Exporter -setup => {
 # Load the functional interfaces. The XS package already loaded all
 # the real implementation anyway.
 #
-require Judy::1;
-require Judy::L;
-require Judy::SL;
-require Judy::HS;
+local $Judy::LOADING = 1;
 
 # Load the OO interfaces.
 #
@@ -61,5 +49,12 @@ require Judy::_obj;
 # 
 require Judy::_tie;
 Judy::_tie->import;
+
+require Judy::1;
+require Judy::L;
+require Judy::SL;
+require Judy::HS;
+
+
 
 1;

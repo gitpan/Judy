@@ -29,7 +29,7 @@ name: Judy
 provides:
   Judy:
     file: lib/Judy.pm
-    version: 0.35
+    version: 0.36
   Judy::1:
     file: lib/Judy/1.pm
   Judy::HS:
@@ -51,4 +51,4 @@ requires:
   warnings: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.35
+version: 0.36
