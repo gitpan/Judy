@@ -1,6 +1,6 @@
 ---
 name: Judy
-version: 0.38
+version: 0.39
 author:
 abstract: Library for creating and accessing dynamic arrays
 license: perl
@@ -39,7 +39,7 @@ meta-spec:
 provides:
   Judy:
     file: lib/Judy.pm
-    version: 0.38
+    version: 0.39
   Judy::1:
     file: lib/Judy/1.pm
   Judy::HS:
