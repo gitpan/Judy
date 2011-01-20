@@ -1,9 +1,6 @@
 ---
-name: Judy
-version: 0.39
-author:
-abstract: Library for creating and accessing dynamic arrays
-license: perl
+abstract: 'Library for creating and accessing dynamic arrays'
+author: []
 build_requires:
   Config: 0
   DynaLoader: 0
@@ -16,15 +13,6 @@ build_requires:
   strict: 0
   vars: 0
   warnings: 0
-requires:
-  Alien::Judy: 0.18
-  Config: 0
-  DynaLoader: 0
-  Sub::Exporter: 0
-  constant: 0
-  perl: v5.6.0
-  strict: 0
-  warnings: 0
 configure_requires:
   File::Spec: 0
   Module::Build: 0
@@ -32,14 +20,16 @@ configure_requires:
   vars: 0
   warnings: 0
 dynamic_config: 1
-generated_by: Module::Build version 0.340201
+generated_by: 'Module::Build version 0.3603'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
+name: Judy
 provides:
   Judy:
     file: lib/Judy.pm
-    version: 0.39
+    version: 0.40
   Judy::1:
     file: lib/Judy/1.pm
   Judy::HS:
@@ -50,5 +40,15 @@ provides:
     file: lib/Judy/Mem.pm
   Judy::SL:
     file: lib/Judy/SL.pm
+requires:
+  Alien::Judy: 0.26
+  Config: 0
+  DynaLoader: 0
+  Sub::Exporter: 0
+  constant: 0
+  perl: v5.6.0
+  strict: 0
+  warnings: 0
 resources:
   license: http://dev.perl.org/licenses/
+version: 0.40
